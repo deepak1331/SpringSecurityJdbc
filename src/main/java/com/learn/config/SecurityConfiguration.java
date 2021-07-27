@@ -28,8 +28,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			.withUser(User.withUsername("admin").password("pass").roles(Roles.ADMIN.name()));
 			*/
 		
-		//Now since we have added the schema.sql and data.sql the above code is commented
-		auth.jdbcAuthentication().dataSource(dataSource);
+		//Now since we have added the default schema, i.e schema.sql and data.sql the above code is commented
+//		auth.jdbcAuthentication().dataSource(dataSource);
+		
+		//If we're using different db which has different tables to store user/roles details, we can declare that using below queries.
+		
+		auth.jdbcAuthentication().dataSource(dataSource)
+			.usersByUsernameQuery("SELECT username, password, enabled from users where username = ?")
+			.authoritiesByUsernameQuery("SELECT username, authority from authorities where username = ?");
 	}
 
 	@Override
