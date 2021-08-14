@@ -41,11 +41,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 
-		http.authorizeRequests()
-			.antMatchers("/admin/**").hasRole(Roles.ADMIN.name())
-			.antMatchers("/user/**").hasAnyRole(Roles.ADMIN.name(), Roles.USER.name())
-			.antMatchers("/").permitAll()
-			.and().formLogin();
+		  http.authorizeRequests()
+		  .antMatchers("/admin/**").hasRole(Roles.ADMIN.name())
+		  .antMatchers("/user/**").hasAnyRole(Roles.ADMIN.name(), Roles.USER.name())
+          .antMatchers("/h2-console/**").permitAll()									//allow h2 console access to admins only
+          .anyRequest().authenticated()													//all other urls can be access by any authenticated role
+          .and().formLogin()															//enable form login instead of basic login
+          .and().csrf().ignoringAntMatchers("/h2-console/**")							//don't apply CSRF protection to /h2-console
+          .and().headers().frameOptions().sameOrigin();									//Since the H2 database console runs inside a frame, you need to enable this in in Spring Security.
+	
 	}
 	
 	@Bean
